@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
-import { INITIAL_ASSETS } from '../page';
 import Script from 'next/script';
+import { Asset, INITIAL_ASSETS } from '../../data/assets';
 
 // Add type declaration for Jupiter global
 declare global {
@@ -23,19 +23,6 @@ declare global {
       }) => void;
     };
   }
-}
-
-interface Asset {
-  id: string;
-  name: string;
-  symbol: string;
-  image: string;
-  price: number;
-  market_cap: number;
-  volume_24h: number;
-  percent_change_24h: number;
-  borrowRate?: number;
-  cmcId?: string;
 }
 
 interface TokenData extends Asset {

@@ -3,142 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-
-interface Asset {
-  id: string;
-  name: string;
-  symbol: string;
-  image: string;
-  price: number;
-  market_cap: number;
-  volume_24h: number;
-  percent_change_24h: number;
-  borrowRate?: number;
-  cmcId?: string; // CoinMarketCap ID
-}
-
-export const INITIAL_ASSETS = [
-  { 
-    id: 'trump-2024', 
-    name: 'Official Trump', 
-    symbol: 'TRUMP', 
-    image: '/assets/trump.png',
-    cmcId: '35336',
-    borrowRate: 4.2, 
-    price: 0, 
-    market_cap: 0, 
-    volume_24h: 0, 
-    percent_change_24h: 0 
-  },
-  { 
-    id: 'bonk', 
-    name: 'Bonk', 
-    symbol: 'BONK', 
-    image: '/assets/bonk.png',
-    cmcId: '23095',
-    borrowRate: 5.8, 
-    price: 0, 
-    market_cap: 0, 
-    volume_24h: 0, 
-    percent_change_24h: 0 
-  },
-  { 
-    id: 'dogwifhat', 
-    name: 'dogwifhat', 
-    symbol: 'WIF', 
-    image: '/assets/wif.png',
-    cmcId: '28752',
-    borrowRate: 6.2, 
-    price: 0, 
-    market_cap: 0, 
-    volume_24h: 0, 
-    percent_change_24h: 0 
-  },
-  { 
-    id: 'fartcoin', 
-    name: 'Fartcoin', 
-    symbol: 'FARTCOIN', 
-    image: '/assets/fartcoin.png',
-    cmcId: '33597', 
-    borrowRate: 3.5, 
-    price: 0, 
-    market_cap: 0, 
-    volume_24h: 0, 
-    percent_change_24h: 0 
-  },
-  { 
-    id: 'pudgy', 
-    name: 'Pudgy Penguins', 
-    symbol: 'PENGU', 
-    image: '/assets/pengu.png',
-    cmcId: '34466', 
-    borrowRate: 4.8, 
-    price: 0, 
-    market_cap: 0, 
-    volume_24h: 0, 
-    percent_change_24h: 0 
-  },
-  { 
-    id: 'popcat', 
-    name: 'Popcat', 
-    symbol: 'POPCAT', 
-    image: '/assets/popcat.png',
-    cmcId: '28782', 
-    borrowRate: 3.9, 
-    price: 0, 
-    market_cap: 0, 
-    volume_24h: 0, 
-    percent_change_24h: 0 
-  },
-  { 
-    id: 'mew', 
-    name: 'cat in a dogs world', 
-    symbol: 'MEW', 
-    image: '/assets/mew.png',
-    cmcId: '30126', 
-    borrowRate: 5.1, 
-    price: 0, 
-    market_cap: 0, 
-    volume_24h: 0, 
-    percent_change_24h: 0 
-  },
-  { 
-    id: 'baby-doge-coin', 
-    name: 'Baby Doge Coin', 
-    symbol: 'BABYDOGE', 
-    image: '/assets/babydoge.png',
-    cmcId: '10407',
-    borrowRate: 4.5, 
-    price: 0, 
-    market_cap: 0, 
-    volume_24h: 0, 
-    percent_change_24h: 0 
-  },
-  { 
-    id: 'gigachad', 
-    name: 'Gigachad', 
-    symbol: 'GIGA', 
-    image: '/assets/giga.png',
-    cmcId: '30063', 
-    borrowRate: 6.7, 
-    price: 0, 
-    market_cap: 0, 
-    volume_24h: 0, 
-    percent_change_24h: 0 
-  },
-  { 
-    id: 'ai16z', 
-    name: 'ai16z', 
-    symbol: 'AI16Z', 
-    image: '/assets/ai16z.png',
-    cmcId: '34026', 
-    borrowRate: 5.4, 
-    price: 0, 
-    market_cap: 0, 
-    volume_24h: 0, 
-    percent_change_24h: 0 
-  },
-] as Asset[];
+import { Asset, INITIAL_ASSETS } from '../data/assets';
 
 export default function MarketsPage() {
   const [assets, setAssets] = useState<Asset[]>(INITIAL_ASSETS);
@@ -187,25 +52,18 @@ export default function MarketsPage() {
           .map(asset => {
             if (asset.cmcId && data[asset.cmcId]) {
               const marketData = data[asset.cmcId];
-              console.log(`Processing ${asset.symbol}:`, marketData);
-              const price = marketData.quote.USD.price;
-              const marketCap = marketData.quote.USD.market_cap;
-              const percentChange = marketData.quote.USD.percent_change_24h;
-              
               return {
                 ...asset,
-                price: price,
-                market_cap: marketCap,
+                price: marketData.quote.USD.price,
+                market_cap: marketData.quote.USD.market_cap,
                 volume_24h: marketData.quote.USD.volume_24h,
-                percent_change_24h: percentChange,
+                percent_change_24h: marketData.quote.USD.percent_change_24h,
               };
             }
-            console.warn(`No data found for ${asset.symbol} (CMC ID: ${asset.cmcId})`);
             return asset;
           })
-          .sort((a, b) => (b.market_cap || 0) - (a.market_cap || 0)); // Sort by market cap in descending order, handle null values
-        
-        console.log('Updated assets:', updatedAssets);
+          .sort((a, b) => b.market_cap - a.market_cap);
+
         setAssets(updatedAssets);
       } catch (error) {
         console.error('Error fetching market data:', error);
@@ -221,65 +79,78 @@ export default function MarketsPage() {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-2xl font-bold mb-6">Markets</h1>
-      
-      <div className="bg-[#1F2937] rounded-lg overflow-hidden">
-        <div className="grid grid-cols-6 gap-4 p-4 text-sm text-gray-400 border-b border-gray-700">
-          <div>Asset</div>
-          <div>Price</div>
-          <div>24h Change</div>
-          <div>Market Cap</div>
-          <div>Borrow Rate</div>
-          <div></div>
-        </div>
-
-        {loading ? (
-          <div className="p-8 text-center text-gray-400">Loading market data...</div>
-        ) : (
-          <div className="divide-y divide-gray-700">
+    <div className="container mx-auto px-4 py-8">
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-gray-800 rounded-lg overflow-hidden">
+          <thead>
+            <tr className="text-left text-gray-400">
+              <th className="px-6 py-3">Asset</th>
+              <th className="px-6 py-3">Price</th>
+              <th className="px-6 py-3">24h Change</th>
+              <th className="px-6 py-3">Market Cap</th>
+              <th className="px-6 py-3">Volume (24h)</th>
+              <th className="px-6 py-3">Borrow Rate</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-700">
             {assets.map((asset) => (
-              <div key={asset.symbol} className="grid grid-cols-6 gap-4 p-4 items-center hover:bg-gray-800">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-gray-700">
-                    <Image src={asset.image} alt={asset.name} width={32} height={32} />
-                  </div>
-                  <div>
-                    <div className="font-medium text-white">{asset.name}</div>
-                    <div className="text-sm text-gray-400">{asset.symbol}</div>
-                  </div>
-                </div>
-                <div className="text-white">
-                  ${asset.price ? (
-                    asset.price < 0.0001 ? 
-                      `0.0${asset.price.toExponential(5).split('e-')[0].replace('.', '')}`
-                    : asset.price.toFixed(7)
-                  ) : '0.0000000'}
-                </div>
-                <div className={asset.percent_change_24h >= 0 ? 'text-green-500' : 'text-red-500'}>
-                  {asset.percent_change_24h?.toFixed(2)}%
-                </div>
-                <div className="text-white">
-                  {asset.symbol === 'SOL' 
-                    ? `$${(asset.market_cap / 1000000000).toFixed(2)}B`
-                    : `$${(asset.market_cap / 1000000).toFixed(2)}M`
-                  }
-                </div>
-                <div className="text-white">
-                  {asset.borrowRate ? `${asset.borrowRate}%` : '-'}
-                </div>
-                <div>
-                  <Link 
-                    href={`/markets/${asset.symbol.toLowerCase()}`}
-                    className="text-blue-500 hover:text-blue-400"
-                  >
-                    Details
+              <tr
+                key={asset.id}
+                className="hover:bg-gray-700 transition-colors"
+              >
+                <td className="px-6 py-4">
+                  <Link href={`/markets/${asset.symbol.toLowerCase()}`}>
+                    <div className="flex items-center">
+                      <Image
+                        src={asset.image}
+                        alt={asset.name}
+                        width={32}
+                        height={32}
+                        className="rounded-full"
+                      />
+                      <div className="ml-3">
+                        <div className="font-medium">{asset.name}</div>
+                        <div className="text-sm text-gray-400">
+                          {asset.symbol}
+                        </div>
+                      </div>
+                    </div>
                   </Link>
-                </div>
-              </div>
+                </td>
+                <td className="px-6 py-4">
+                  ${asset.price < 0.01 
+                    ? asset.price.toFixed(8)
+                    : asset.price.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
+                  }
+                </td>
+                <td className="px-6 py-4">
+                  <span
+                    className={
+                      asset.percent_change_24h >= 0
+                        ? 'text-green-500'
+                        : 'text-red-500'
+                    }
+                  >
+                    {asset.percent_change_24h >= 0 ? '+' : ''}
+                    {asset.percent_change_24h.toFixed(2)}%
+                  </span>
+                </td>
+                <td className="px-6 py-4">
+                  ${(asset.market_cap / 1000000).toFixed(0)}M
+                </td>
+                <td className="px-6 py-4">
+                  ${(asset.volume_24h / 1000000).toFixed(0)}M
+                </td>
+                <td className="px-6 py-4">
+                  {asset.borrowRate ? `${asset.borrowRate}%` : '-'}
+                </td>
+              </tr>
             ))}
-          </div>
-        )}
+          </tbody>
+        </table>
       </div>
     </div>
   );
