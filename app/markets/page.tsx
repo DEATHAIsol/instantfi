@@ -90,6 +90,7 @@ export default function MarketsPage() {
               <th className="px-6 py-3">Market Cap</th>
               <th className="px-6 py-3">Volume (24h)</th>
               <th className="px-6 py-3">Borrow Rate</th>
+              <th className="px-6 py-3"></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-700">
@@ -144,8 +145,16 @@ export default function MarketsPage() {
                 <td className="px-6 py-4">
                   ${(asset.volume_24h / 1000000).toFixed(0)}M
                 </td>
+                <td className="px-6 py-4 text-blue-400">
+                  {asset.borrowRate}%
+                </td>
                 <td className="px-6 py-4">
-                  {asset.borrowRate ? `${asset.borrowRate}%` : '-'}
+                  <Link
+                    href={`/markets/${asset.symbol.toLowerCase()}`}
+                    className="text-blue-400 hover:text-blue-300"
+                  >
+                    Details →
+                  </Link>
                 </td>
               </tr>
             ))}

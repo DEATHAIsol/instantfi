@@ -1,5 +1,6 @@
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
+import { INITIAL_ASSETS } from '../data/assets';
 
 const supplyAssets = [
   { name: 'Official Trump', symbol: 'TRUMP', image: '/assets/trump.png' },
@@ -66,7 +67,7 @@ export default function Market() {
             </div>
 
             <div className="space-y-4">
-              {supplyAssets.map((asset) => (
+              {INITIAL_ASSETS.map((asset) => (
                 <div key={asset.symbol} className="grid grid-cols-4 gap-4 items-center">
                   <div className="flex items-center space-x-2">
                     <div className="w-8 h-8 rounded-full overflow-hidden">
@@ -78,7 +79,7 @@ export default function Market() {
                     </div>
                   </div>
                   <div>0</div>
-                  <div>0%</div>
+                  <div>{asset.supplyRate.toFixed(2)}%</div>
                   <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
                     Supply
                   </button>
